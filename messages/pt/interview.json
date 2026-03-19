@@ -1,0 +1,16 @@
+{
+  "connected":    "Conectado",
+  "disconnected": "Desconectado",
+  "complete":     "Entrevista concluída",
+  "newInterview": "Nova entrevista",
+  "history":      "Histórico",
+  "interviewer":  "Entrevistador IA",
+  "candidate":    "Candidato(a)",
+  "progress":     "Progresso da entrevista",
+  "questions":    "perguntas",
+  "waitingStart": "A entrevista começará em breve...",
+  "aiIdle":       "Aguardando",
+  "aiThinking":   "Processando...",
+  "aiSpeaking":   "Falando...",
+  "aiListening":  "Ouvindo você"
+}

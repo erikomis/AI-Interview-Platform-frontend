@@ -1,0 +1,8 @@
+{
+  "successTitle":   "Email verificado!",
+  "successMessage": "Sua conta está ativa. Você já pode entrar.",
+  "failTitle":      "Verificação falhou",
+  "failMessage":    "Link de verificação inválido ou expirado.",
+  "signIn":         "Entrar",
+  "goHome":         "Ir para o início"
+}

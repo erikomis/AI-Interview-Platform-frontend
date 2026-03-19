@@ -1,0 +1,11 @@
+{
+  "title":          "Replay da entrevista",
+  "messages":       "{current} / {total} mensagens",
+  "reset":          "Reiniciar",
+  "previous":       "Anterior",
+  "pause":          "Pausar",
+  "play":           "Reproduzir",
+  "next":           "Próximo",
+  "aiLabel":        "Alex (IA)",
+  "candidateLabel": "Candidato(a)"
+}

@@ -1,0 +1,14 @@
+{
+  "title":         "Resultado Final",
+  "criteriaTitle": "Avaliação por critério",
+  "technical":     "Técnico",
+  "communication": "Comunicação",
+  "confidence":    "Confiança",
+  "clarity":       "Clareza",
+  "strengths":     "Pontos fortes",
+  "improvements":  "Pontos a melhorar",
+  "excellent":     "Excelente",
+  "good":          "Bom",
+  "average":       "Regular",
+  "needsWork":     "Precisa melhorar"
+}

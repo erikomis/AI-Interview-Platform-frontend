@@ -1,0 +1,10 @@
+{
+  "cameraOff":          "Câmera desativada",
+  "live":               "AO VIVO",
+  "disableCamera":      "Desativar câmera",
+  "enableCamera":       "Ativar câmera",
+  "behavioralAnalysis": "Análise comportamental",
+  "eyeContact":         "Contato visual",
+  "confidence":         "Confiança",
+  "stressLevel":        "Nível de estresse"
+}

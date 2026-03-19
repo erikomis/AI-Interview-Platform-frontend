@@ -1,0 +1,37 @@
+{
+  "title":           "Iniciar entrevista",
+  "subtitle":        "Preencha os dados abaixo para começar sua simulação",
+  "nameLabel":       "Seu nome",
+  "namePlaceholder": "Ex: João Silva",
+  "roleLabel":       "Vaga desejada",
+  "rolePlaceholder": "Ex: Desenvolvedor Backend",
+  "levelLabel":      "Nível de experiência",
+  "levelJunior":     "Junior",
+  "levelMid":        "Pleno",
+  "levelSenior":     "Senior",
+  "startBtn":        "Começar entrevista",
+  "starting":        "Iniciando...",
+  "footer":          "5 perguntas · feedback completo ao final",
+  "sessionLabel":     "Modo de sessão",
+  "sessionModeLabel": "Modo de sessão",
+  "sessionPractice":  "Prática (5 perguntas)",
+  "sessionFull":      "Completa (10 perguntas)",
+  "sessionIntensive": "Intensiva (15 perguntas)",
+  "addCv":            "+ Adicionar CV / Currículo",
+  "cvLabel":          "Resumo do CV",
+  "cvPlaceholder":    "Cole aqui um resumo do seu currículo...",
+  "errors": {
+    "nameRequired": "Informe seu nome.",
+    "roleRequired": "Informe a vaga desejada."
+  },
+  "roles": [
+    "Desenvolvedor Frontend",
+    "Desenvolvedor Backend",
+    "Engenheiro Full Stack",
+    "Engenheiro de Dados",
+    "DevOps / SRE",
+    "Product Manager",
+    "UX Designer",
+    "Analista de QA"
+  ]
+}
