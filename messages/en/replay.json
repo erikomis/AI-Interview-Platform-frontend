@@ -1,0 +1,11 @@
+{
+  "title":          "Interview replay",
+  "messages":       "{current} / {total} messages",
+  "reset":          "Reset",
+  "previous":       "Previous",
+  "pause":          "Pause",
+  "play":           "Play",
+  "next":           "Next",
+  "aiLabel":        "Alex (AI)",
+  "candidateLabel": "Candidate"
+}

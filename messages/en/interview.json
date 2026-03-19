@@ -1,0 +1,16 @@
+{
+  "connected":    "Connected",
+  "disconnected": "Disconnected",
+  "complete":     "Interview completed",
+  "newInterview": "New interview",
+  "history":      "History",
+  "interviewer":  "AI Interviewer",
+  "candidate":    "Candidate",
+  "progress":     "Interview progress",
+  "questions":    "questions",
+  "waitingStart": "The interview will begin shortly...",
+  "aiIdle":       "Waiting",
+  "aiThinking":   "Processing...",
+  "aiSpeaking":   "Speaking...",
+  "aiListening":  "Listening"
+}

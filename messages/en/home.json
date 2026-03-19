@@ -1,0 +1,17 @@
+{
+  "poweredBy":    "Powered by AI",
+  "heroTitle":    "Prepare for your",
+  "heroHighlight": "next interview",
+  "heroSubtitle": "Practice with an AI interviewer in English. Get detailed feedback on your answers, communication and body language.",
+  "features": {
+    "ai":       { "title": "Conversational AI",   "desc": "Adaptive AI interviewer" },
+    "voice":    { "title": "Voice response",      "desc": "Speak naturally in English" },
+    "video":    { "title": "Video analysis",      "desc": "Body language feedback" },
+    "feedback": { "title": "Detailed feedback",   "desc": "Full report at the end" }
+  },
+  "stats": {
+    "questions": { "value": "5",    "label": "questions per session" },
+    "language":  { "value": "100%", "label": "in English" },
+    "ai":        { "value": "AI",   "label": "intelligent feedback" }
+  }
+}

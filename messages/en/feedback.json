@@ -1,0 +1,14 @@
+{
+  "title":         "Final Result",
+  "criteriaTitle": "Criteria breakdown",
+  "technical":     "Technical",
+  "communication": "Communication",
+  "confidence":    "Confidence",
+  "clarity":       "Clarity",
+  "strengths":     "Strengths",
+  "improvements":  "Areas to improve",
+  "excellent":     "Excellent",
+  "good":          "Good",
+  "average":       "Average",
+  "needsWork":     "Needs work"
+}

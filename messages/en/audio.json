@@ -1,0 +1,12 @@
+{
+  "aiProcessing": "AI is processing...",
+  "aiSpeaking":   "AI is speaking...",
+  "yourTurn":     "Your turn to answer",
+  "waitingStart": "Waiting to start",
+  "recording":    "Recording...",
+  "stopAndSend":  "Stop and send",
+  "waitForAI":    "Wait for AI...",
+  "typeAnswer":   "Type your answer...",
+  "recordAudio":  "Record audio answer",
+  "sendAnswer":   "Send answer"
+}

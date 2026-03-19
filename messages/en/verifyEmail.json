@@ -1,0 +1,8 @@
+{
+  "successTitle":   "Email verified!",
+  "successMessage": "Your account is now active. You can sign in.",
+  "failTitle":      "Verification failed",
+  "failMessage":    "Invalid or expired verification link.",
+  "signIn":         "Sign in",
+  "goHome":         "Go to home"
+}

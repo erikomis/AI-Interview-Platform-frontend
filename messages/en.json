@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "title": "AI Interview Platform",
+    "description": "Practice technical interviews with AI"
+  },
+  "common": {
+    "brand": "AI Interview",
+    "aiName": "Alex"
+  },
+  "home": {
+    "poweredBy": "Powered by AI",
+    "heroTitle": "Prepare for your",
+    "heroHighlight": "next interview",
+    "heroSubtitle": "Practice with an AI interviewer in English. Get detailed feedback on your answers, communication and body language.",
+    "features": {
+      "ai":       { "title": "Conversational AI",   "desc": "Adaptive AI interviewer" },
+      "voice":    { "title": "Voice response",      "desc": "Speak naturally in English" },
+      "video":    { "title": "Video analysis",      "desc": "Body language feedback" },
+      "feedback": { "title": "Detailed feedback",   "desc": "Full report at the end" }
+    },
+    "stats": {
+      "questions": { "value": "5",    "label": "questions per session" },
+      "language":  { "value": "100%", "label": "in English" },
+      "ai":        { "value": "AI",   "label": "intelligent feedback" }
+    }
+  },
+  "header": {
+    "history": "History",
+    "logout":  "Log out",
+    "login":   "Log in"
+  },
+  "historyNav": {
+    "title": "Interview history",
+    "home":  "Home"
+  },
+  "auth": {
+    "titleRegister":    "Create your account",
+    "titleLogin":       "Welcome back",
+    "subtitleRegister": "Start practising your technical interviews",
+    "subtitleLogin":    "Sign in to access your interviews",
+    "nameLabel":                    "Full name",
+    "namePlaceholder":              "John Smith",
+    "emailLabel":                   "Email",
+    "emailPlaceholder":             "you@example.com",
+    "passwordLabel":                "Password",
+    "passwordPlaceholderNew":       "Min. 8 characters",
+    "passwordPlaceholderExisting":  "Your password",
+    "submitRegister":    "Create account",
+    "submitLogin":       "Sign in",
+    "loadingRegister":   "Creating account...",
+    "loadingLogin":      "Signing in...",
+    "haveAccount": "Already have an account?",
+    "noAccount":   "Don't have an account?",
+    "signIn":    "Sign in",
+    "createOne": "Create one",
+    "passwordRules": {
+      "minChars":  "At least 8 characters",
+      "uppercase": "1 uppercase letter",
+      "lowercase": "1 lowercase letter",
+      "number":    "1 number",
+      "special":   "1 special character"
+    },
+    "errors": {
+      "emailInvalid":  "Invalid email address.",
+      "nameTooShort":  "Name must be at least 2 characters.",
+      "passwordWeak":  "Password doesn't meet all requirements."
+    },
+    "forgotPassword":   "Forgot password?",
+    "verifyTitle":      "Check your inbox",
+    "verifySent":       "We sent a verification link to",
+    "verifyResend":     "Resend email",
+    "verifyResending":  "Sending...",
+    "verifyResent":     "Sent!",
+    "verifyContinue":   "Continue to app"
+  },
+  "audio": {
+    "aiProcessing":  "AI is processing...",
+    "aiSpeaking":    "AI is speaking...",
+    "yourTurn":      "Your turn to answer",
+    "waitingStart":  "Waiting to start",
+    "recording":     "Recording...",
+    "stopAndSend":   "Stop and send",
+    "waitForAI":     "Wait for AI...",
+    "typeAnswer":    "Type your answer...",
+    "recordAudio":   "Record audio answer",
+    "sendAnswer":    "Send answer"
+  },
+  "video": {
+    "cameraOff":          "Camera disabled",
+    "live":               "LIVE",
+    "disableCamera":      "Disable camera",
+    "enableCamera":       "Enable camera",
+    "behavioralAnalysis": "Behavioral analysis",
+    "eyeContact":         "Eye contact",
+    "confidence":         "Confidence",
+    "stressLevel":        "Stress level"
+  },
+  "interviewForm": {
+    "title":            "Start interview",
+    "subtitle":         "Fill in the details below to begin your simulation",
+    "nameLabel":        "Your name",
+    "namePlaceholder":  "E.g.: John Smith",
+    "roleLabel":        "Target role",
+    "rolePlaceholder":  "E.g.: Backend Developer",
+    "levelLabel":       "Experience level",
+    "levelJunior":      "Junior",
+    "levelMid":         "Mid-level",
+    "levelSenior":      "Senior",
+    "startBtn":         "Start interview",
+    "starting":         "Starting...",
+    "footer":           "5 questions · full feedback at the end",
+    "sessionLabel":     "Session mode",
+    "sessionModeLabel": "Session mode",
+    "sessionPractice":  "Practice (5 questions)",
+    "sessionFull":      "Full (10 questions)",
+    "sessionIntensive": "Intensive (15 questions)",
+    "addCv":            "+ Add CV / Résumé",
+    "cvLabel":          "CV summary",
+    "cvPlaceholder":    "Paste a summary of your resume here...",
+    "errors": {
+      "nameRequired": "Please enter your name.",
+      "roleRequired": "Please enter the desired role."
+    },
+    "roles": [
+      "Frontend Developer",
+      "Backend Developer",
+      "Full Stack Engineer",
+      "Data Engineer",
+      "DevOps / SRE",
+      "Product Manager",
+      "UX Designer",
+      "QA Analyst"
+    ]
+  },
+  "interview": {
+    "connected":    "Connected",
+    "disconnected": "Disconnected",
+    "complete":     "Interview completed",
+    "newInterview": "New interview",
+    "history":      "History",
+    "interviewer":  "AI Interviewer",
+    "candidate":    "Candidate",
+    "progress":     "Interview progress",
+    "questions":    "questions",
+    "waitingStart": "The interview will begin shortly...",
+    "aiIdle":       "Waiting",
+    "aiThinking":   "Processing...",
+    "aiSpeaking":   "Speaking...",
+    "aiListening":  "Listening"
+  },
+  "feedback": {
+    "title":          "Final Result",
+    "criteriaTitle":  "Criteria breakdown",
+    "technical":      "Technical",
+    "communication":  "Communication",
+    "confidence":     "Confidence",
+    "clarity":        "Clarity",
+    "strengths":      "Strengths",
+    "improvements":   "Areas to improve",
+    "excellent":      "Excellent",
+    "good":           "Good",
+    "average":        "Average",
+    "needsWork":      "Needs work"
+  },
+  "forgotPassword": {
+    "title":        "Forgot password?",
+    "subtitle":     "Enter your email and we'll send a reset link.",
+    "emailLabel":   "Email",
+    "submit":       "Send reset link",
+    "sending":      "Sending...",
+    "sentMessage":  "If {email} is registered, a reset link has been sent. Check your inbox (and spam folder).",
+    "backToLogin":  "Back to sign in",
+    "invalidEmail": "Please enter a valid email address."
+  },
+  "resetPassword": {
+    "title":         "Set new password",
+    "subtitle":      "Choose a strong password for your account.",
+    "passwordLabel": "New password",
+    "submit":        "Update password",
+    "updating":      "Updating password...",
+    "doneMessage":   "Your password has been updated. All previous sessions have been signed out.",
+    "signIn":        "Sign in with new password",
+    "invalidToken":  "Invalid or expired reset link.",
+    "weakPassword":  "Password does not meet all requirements."
+  },
+  "verifyEmail": {
+    "successTitle":   "Email verified!",
+    "successMessage": "Your account is now active. You can sign in.",
+    "failTitle":      "Verification failed",
+    "failMessage":    "Invalid or expired verification link.",
+    "signIn":         "Sign in",
+    "goHome":         "Go to home"
+  },
+  "heatmap": {
+    "title":       "Behavior heatmap",
+    "noData":      "No vision data captured.",
+    "samples":     "{count} samples",
+    "start":       "start",
+    "better":      "better",
+    "end":         "end",
+    "eyeContact":  "Eye contact",
+    "confidence":  "Confidence",
+    "stress":      "Stress"
+  },
+  "replay": {
+    "title":          "Interview replay",
+    "messages":       "{current} / {total} messages",
+    "reset":          "Reset",
+    "previous":       "Previous",
+    "pause":          "Pause",
+    "play":           "Play",
+    "next":           "Next",
+    "aiLabel":        "Alex (AI)",
+    "candidateLabel": "Candidate"
+  },
+  "historyPage": {
+    "noInterviews":     "No interviews yet. Complete your first one!",
+    "startNow":         "Start now",
+    "completedCount":   "{count, plural, one {# completed interview} other {# completed interviews}}",
+    "averageScore":     "Average score:",
+    "notCompleted":     "Not completed",
+    "strengths":        "Strengths",
+    "improvements":     "Improvements",
+    "levelJunior":      "Junior",
+    "levelMid":         "Mid-level",
+    "levelSenior":      "Senior",
+    "langPt":           "PT-BR",
+    "langEn":           "English"
+  }
+}

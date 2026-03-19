@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "title": "AI Interview Platform",
+    "description": "Pratique entrevistas técnicas com IA"
+  },
+  "common": {
+    "brand": "AI Interview",
+    "aiName": "Alex"
+  },
+  "home": {
+    "poweredBy": "Powered by IA",
+    "heroTitle": "Prepare-se para sua",
+    "heroHighlight": "próxima entrevista",
+    "heroSubtitle": "Pratique com um entrevistador de IA em português. Receba feedback detalhado sobre suas respostas, comunicação e postura.",
+    "features": {
+      "ai":       { "title": "IA Conversacional",  "desc": "Entrevistador adaptativo por IA" },
+      "voice":    { "title": "Resposta por voz",   "desc": "Fale naturalmente em português" },
+      "video":    { "title": "Análise de vídeo",   "desc": "Feedback de linguagem corporal" },
+      "feedback": { "title": "Feedback detalhado", "desc": "Relatório completo ao final" }
+    },
+    "stats": {
+      "questions": { "value": "5",    "label": "perguntas por sessão" },
+      "language":  { "value": "100%", "label": "em português" },
+      "ai":        { "value": "IA",   "label": "feedback inteligente" }
+    }
+  },
+  "header": {
+    "history": "Histórico",
+    "logout":  "Sair",
+    "login":   "Entrar"
+  },
+  "historyNav": {
+    "title": "Histórico de entrevistas",
+    "home":  "Início"
+  },
+  "auth": {
+    "titleRegister":    "Crie sua conta",
+    "titleLogin":       "Bem-vindo(a) de volta",
+    "subtitleRegister": "Comece a praticar suas entrevistas técnicas",
+    "subtitleLogin":    "Entre para acessar suas entrevistas",
+    "nameLabel":                    "Nome completo",
+    "namePlaceholder":              "João Silva",
+    "emailLabel":                   "Email",
+    "emailPlaceholder":             "voce@exemplo.com",
+    "passwordLabel":                "Senha",
+    "passwordPlaceholderNew":       "Mín. 8 caracteres",
+    "passwordPlaceholderExisting":  "Sua senha",
+    "submitRegister":    "Criar conta",
+    "submitLogin":       "Entrar",
+    "loadingRegister":   "Criando conta...",
+    "loadingLogin":      "Entrando...",
+    "haveAccount": "Já tem uma conta?",
+    "noAccount":   "Não tem uma conta?",
+    "signIn":    "Entre",
+    "createOne": "Crie uma",
+    "passwordRules": {
+      "minChars":  "Mínimo 8 caracteres",
+      "uppercase": "1 letra maiúscula",
+      "lowercase": "1 letra minúscula",
+      "number":    "1 número",
+      "special":   "1 caractere especial"
+    },
+    "errors": {
+      "emailInvalid":  "Email inválido.",
+      "nameTooShort":  "Nome deve ter pelo menos 2 caracteres.",
+      "passwordWeak":  "A senha não atende todos os requisitos."
+    },
+    "forgotPassword":   "Esqueceu a senha?",
+    "verifyTitle":      "Verifique seu email",
+    "verifySent":       "Enviamos um link de verificação para",
+    "verifyResend":     "Reenviar email",
+    "verifyResending":  "Enviando...",
+    "verifyResent":     "Enviado!",
+    "verifyContinue":   "Continuar para o app"
+  },
+  "audio": {
+    "aiProcessing":  "IA está processando...",
+    "aiSpeaking":    "IA está falando...",
+    "yourTurn":      "Sua vez de responder",
+    "waitingStart":  "Aguardando início",
+    "recording":     "Gravando...",
+    "stopAndSend":   "Parar e enviar",
+    "waitForAI":     "Aguarde a IA...",
+    "typeAnswer":    "Digite sua resposta...",
+    "recordAudio":   "Gravar resposta por áudio",
+    "sendAnswer":    "Enviar resposta"
+  },
+  "video": {
+    "cameraOff":          "Câmera desativada",
+    "live":               "AO VIVO",
+    "disableCamera":      "Desativar câmera",
+    "enableCamera":       "Ativar câmera",
+    "behavioralAnalysis": "Análise comportamental",
+    "eyeContact":         "Contato visual",
+    "confidence":         "Confiança",
+    "stressLevel":        "Nível de estresse"
+  },
+  "interviewForm": {
+    "title":            "Iniciar entrevista",
+    "subtitle":         "Preencha os dados abaixo para começar sua simulação",
+    "nameLabel":        "Seu nome",
+    "namePlaceholder":  "Ex: João Silva",
+    "roleLabel":        "Vaga desejada",
+    "rolePlaceholder":  "Ex: Desenvolvedor Backend",
+    "levelLabel":       "Nível de experiência",
+    "levelJunior":      "Junior",
+    "levelMid":         "Pleno",
+    "levelSenior":      "Senior",
+    "startBtn":         "Começar entrevista",
+    "starting":         "Iniciando...",
+    "footer":           "5 perguntas · feedback completo ao final",
+    "sessionLabel":     "Modo de sessão",
+    "sessionModeLabel": "Modo de sessão",
+    "sessionPractice":  "Prática (5 perguntas)",
+    "sessionFull":      "Completa (10 perguntas)",
+    "sessionIntensive": "Intensiva (15 perguntas)",
+    "addCv":            "+ Adicionar CV / Currículo",
+    "cvLabel":          "Resumo do CV",
+    "cvPlaceholder":    "Cole aqui um resumo do seu currículo...",
+    "errors": {
+      "nameRequired": "Informe seu nome.",
+      "roleRequired": "Informe a vaga desejada."
+    },
+    "roles": [
+      "Desenvolvedor Frontend",
+      "Desenvolvedor Backend",
+      "Engenheiro Full Stack",
+      "Engenheiro de Dados",
+      "DevOps / SRE",
+      "Product Manager",
+      "UX Designer",
+      "Analista de QA"
+    ]
+  },
+  "interview": {
+    "connected":    "Conectado",
+    "disconnected": "Desconectado",
+    "complete":     "Entrevista concluída",
+    "newInterview": "Nova entrevista",
+    "history":      "Histórico",
+    "interviewer":  "Entrevistador IA",
+    "candidate":    "Candidato(a)",
+    "progress":     "Progresso da entrevista",
+    "questions":    "perguntas",
+    "waitingStart": "A entrevista começará em breve...",
+    "aiIdle":       "Aguardando",
+    "aiThinking":   "Processando...",
+    "aiSpeaking":   "Falando...",
+    "aiListening":  "Ouvindo você"
+  },
+  "feedback": {
+    "title":          "Resultado Final",
+    "criteriaTitle":  "Avaliação por critério",
+    "technical":      "Técnico",
+    "communication":  "Comunicação",
+    "confidence":     "Confiança",
+    "clarity":        "Clareza",
+    "strengths":      "Pontos fortes",
+    "improvements":   "Pontos a melhorar",
+    "excellent":      "Excelente",
+    "good":           "Bom",
+    "average":        "Regular",
+    "needsWork":      "Precisa melhorar"
+  },
+  "forgotPassword": {
+    "title":        "Esqueceu a senha?",
+    "subtitle":     "Informe seu email e enviaremos um link para redefinição.",
+    "emailLabel":   "Email",
+    "submit":       "Enviar link de redefinição",
+    "sending":      "Enviando...",
+    "sentMessage":  "Se {email} estiver cadastrado, um link foi enviado. Verifique sua caixa de entrada (e spam).",
+    "backToLogin":  "Voltar para o login",
+    "invalidEmail": "Informe um endereço de email válido."
+  },
+  "resetPassword": {
+    "title":         "Definir nova senha",
+    "subtitle":      "Escolha uma senha forte para sua conta.",
+    "passwordLabel": "Nova senha",
+    "submit":        "Atualizar senha",
+    "updating":      "Atualizando senha...",
+    "doneMessage":   "Sua senha foi atualizada. Todas as sessões anteriores foram encerradas.",
+    "signIn":        "Entrar com a nova senha",
+    "invalidToken":  "Link de redefinição inválido ou expirado.",
+    "weakPassword":  "A senha não atende a todos os requisitos."
+  },
+  "verifyEmail": {
+    "successTitle":   "Email verificado!",
+    "successMessage": "Sua conta está ativa. Você já pode entrar.",
+    "failTitle":      "Verificação falhou",
+    "failMessage":    "Link de verificação inválido ou expirado.",
+    "signIn":         "Entrar",
+    "goHome":         "Ir para o início"
+  },
+  "heatmap": {
+    "title":       "Heatmap de comportamento",
+    "noData":      "Nenhum dado de visão capturado.",
+    "samples":     "{count} amostras",
+    "start":       "início",
+    "better":      "melhor",
+    "end":         "fim",
+    "eyeContact":  "Contato visual",
+    "confidence":  "Confiança",
+    "stress":      "Estresse"
+  },
+  "replay": {
+    "title":          "Replay da entrevista",
+    "messages":       "{current} / {total} mensagens",
+    "reset":          "Reiniciar",
+    "previous":       "Anterior",
+    "pause":          "Pausar",
+    "play":           "Reproduzir",
+    "next":           "Próximo",
+    "aiLabel":        "Alex (IA)",
+    "candidateLabel": "Candidato(a)"
+  },
+  "historyPage": {
+    "noInterviews":     "Nenhuma entrevista ainda. Complete a primeira!",
+    "startNow":         "Começar agora",
+    "completedCount":   "{count, plural, one {# entrevista concluída} other {# entrevistas concluídas}}",
+    "averageScore":     "Pontuação média:",
+    "notCompleted":     "Não finalizada",
+    "strengths":        "Pontos fortes",
+    "improvements":     "Melhorias",
+    "levelJunior":      "Junior",
+    "levelMid":         "Pleno / Mid",
+    "levelSenior":      "Senior",
+    "langPt":           "PT-BR",
+    "langEn":           "English"
+  }
+}
