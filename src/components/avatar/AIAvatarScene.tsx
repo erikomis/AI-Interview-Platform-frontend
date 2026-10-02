@@ -14,7 +14,7 @@ interface AIAvatarSceneProps {
 /**
  * 3D interviewers.
  *  - Alex: Microsoft Rocketbox "Business_Male_01" (MIT licence), FBX + textures
- *  - Sofia: Avaturn avatar from the TalkingHead project (free for non-commercial use)
+ *  - Sofia: Microsoft Rocketbox "Business_Female_04" (MIT licence), FBX + textures
  * Both expose ARKit + Oculus viseme blend shapes used for lip-sync.
  */
 const MODELS: Record<Interviewer, AvatarModel> = {
@@ -28,10 +28,11 @@ const MODELS: Record<Interviewer, AvatarModel> = {
     distance: 1.35,
   },
   female: {
-    url: '/avatar/3d/sofia.glb',
-    bones: { head: 'Head', neck: 'Neck', spine: 'Spine2' },
-    pose: { LeftArm: [0, 0, -1.25], RightArm: [0, 0, 1.25] },
-    baseline: { mouthSmile: 0.12 },
+    url: '/avatar/3d/sofia/sofia.fbx',
+    scale: 0.01,
+    bones: { head: 'Bip01_Head', neck: 'Bip01_Neck', spine: 'Bip01_Spine2' },
+    pose: { Bip01_L_UpperArm: [0, 0, -1.2], Bip01_R_UpperArm: [0, 0, 1.2] },
+    baseline: { eyeBlinkLeft: 0.3, eyeBlinkRight: 0.3, mouthSmileLeft: 0.15, mouthSmileRight: 0.15 },
     distance: 1.35,
   },
 }
