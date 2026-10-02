@@ -146,7 +146,15 @@
     "aiIdle":       "Aguardando",
     "aiThinking":   "Processando...",
     "aiSpeaking":   "Falando...",
-    "aiListening":  "Ouvindo você"
+    "aiListening":  "Ouvindo você",
+    "retryFeedback":    "Tentar novamente",
+    "retryingFeedback": "Gerando feedback...",
+    "errors": {
+      "offline":             "Sem conexão com o servidor. Aguarde a reconexão e tente novamente.",
+      "timeout":             "O servidor está demorando demais para responder. Tente enviar sua resposta novamente.",
+      "feedbackFailed":      "Não foi possível gerar o feedback da entrevista.",
+      "feedbackRetryFailed": "Falha ao gerar o feedback. Tente novamente em instantes."
+    }
   },
   "feedback": {
     "title":          "Resultado Final",
@@ -225,6 +233,12 @@
     "levelMid":         "Pleno / Mid",
     "levelSenior":      "Senior",
     "langPt":           "PT-BR",
-    "langEn":           "English"
+    "langEn":           "English",
+    "progress":            "Evolução",
+    "legendOverall":       "Geral",
+    "legendTechnical":     "Técnico",
+    "legendCommunication": "Comunicação",
+    "loadError":           "Não foi possível carregar seu histórico.",
+    "retry":               "Tentar novamente"
   }
 }

@@ -1,18 +1,23 @@
-import { cookies } from "next/headers";
-import { getTranslations, getLocale } from "next-intl/server";
-import { redirect } from "next/navigation";
-import { Trophy, BarChart2, Clock, Globe, Layers } from "lucide-react";
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { Trophy, BarChart2, Clock, Globe, Layers, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HistoryNav } from "@/components/HistoryNav";
 import { Link } from "@/i18n/navigation";
+import { interviewApi } from "@/services/api";
+import { HttpError } from "@/services/auth";
 import type { HistoryInterview, UserHistory, AnalyticsData, AnalyticsSession } from "@/types/interview";
 
 const SCORE_COLOR = (n: number) =>
   n >= 8 ? "text-emerald-400" : n >= 6 ? "text-amber-400" : "text-red-400";
 
-function ProgressChart({ sessions }: { sessions: AnalyticsSession[] }) {
+type LegendLabels = { overall: string; technical: string; communication: string };
+
+function ProgressChart({ sessions, legend }: { sessions: AnalyticsSession[]; legend: LegendLabels }) {
   if (sessions.length < 2) return null;
   const W = 500;
   const H = 160;
@@ -95,70 +100,13 @@ function ProgressChart({ sessions }: { sessions: AnalyticsSession[] }) {
 
       {/* Legend */}
       <circle cx={PAD.left}      cy={PAD.top - 4} r="3" fill="#a78bfa" />
-      <text x={PAD.left + 6}     y={PAD.top}      fontSize="9" fill="#a78bfa">Overall</text>
+      <text x={PAD.left + 6}     y={PAD.top}      fontSize="9" fill="#a78bfa">{legend.overall}</text>
       <circle cx={PAD.left + 52} cy={PAD.top - 4} r="3" fill="#60a5fa" />
-      <text x={PAD.left + 58}    y={PAD.top}      fontSize="9" fill="#60a5fa">Technical</text>
+      <text x={PAD.left + 58}    y={PAD.top}      fontSize="9" fill="#60a5fa">{legend.technical}</text>
       <circle cx={PAD.left + 114} cy={PAD.top - 4} r="3" fill="#34d399" />
-      <text x={PAD.left + 120}   y={PAD.top}      fontSize="9" fill="#34d399">Communication</text>
+      <text x={PAD.left + 120}   y={PAD.top}      fontSize="9" fill="#34d399">{legend.communication}</text>
     </svg>
   );
-}
-
-async function fetchAnalytics(cookieHeader: string): Promise<AnalyticsData | null> {
-  const BASE = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3000";
-  try {
-    const res = await fetch(`${BASE}/interviews/me/analytics`, {
-      headers: { Cookie: cookieHeader },
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return res.json() as Promise<AnalyticsData>;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchHistory(cookieHeader?: string): Promise<UserHistory | null> {
-  const BASE = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3000";
-  if (!cookieHeader) {
-    const cookieStore = await cookies();
-    cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
-  }
-
-  try {
-    let historyRes = await fetch(`${BASE}/interviews/me/history`, {
-      headers: { Cookie: cookieHeader },
-      cache: "no-store",
-    });
-
-    if (historyRes.status === 401) {
-      const refreshRes = await fetch(`${BASE}/auth/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Cookie: cookieHeader },
-        cache: "no-store",
-      });
-
-      if (!refreshRes.ok) return null;
-
-      const setCookies = (refreshRes.headers as Headers & { getSetCookie?: () => string[] })
-        .getSetCookie?.() ?? [refreshRes.headers.get("set-cookie") ?? ""];
-      const newToken = setCookies
-        .find((c) => c.startsWith("access_token="))
-        ?.match(/^access_token=([^;]+)/)?.[1];
-
-      if (!newToken) return null;
-
-      historyRes = await fetch(`${BASE}/interviews/me/history`, {
-        headers: { Cookie: `${cookieHeader}; access_token=${newToken}` },
-        cache: "no-store",
-      });
-    }
-
-    if (!historyRes.ok) return null;
-    return historyRes.json() as Promise<UserHistory>;
-  } catch {
-    return null;
-  }
 }
 
 function ScoreBadge({ label, value }: { label: string; value: number | null }) {
@@ -262,21 +210,69 @@ function InterviewCard({ item, locale, labels }: { item: HistoryInterview; local
   );
 }
 
-export default async function HistoryPage() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+type LoadState =
+  | { status: "loading" }
+  | { status: "error" }
+  | { status: "ready"; data: UserHistory; analytics: AnalyticsData | null };
 
-  const [data, analytics] = await Promise.all([
-    fetchHistory(cookieHeader),
-    fetchAnalytics(cookieHeader),
-  ]);
-  if (!data) return void redirect("/login");
+export default function HistoryPage() {
+  const locale = useLocale();
+  const t = useTranslations("historyPage");
+  const tFeedback = useTranslations("feedback");
+  const [load, setLoad] = useState<LoadState>({ status: "loading" });
 
-  const locale = await getLocale();
-  const t = await getTranslations("historyPage");
-  const tFeedback = await getTranslations("feedback");
+  // Fetched client-side: the refresh_token cookie is scoped to /auth, so only the
+  // browser can refresh an expired access token (apiFetch does it, single-flight).
+  const fetchData = useCallback(async () => {
+    setLoad({ status: "loading" });
+    try {
+      const [data, analytics] = await Promise.all([
+        interviewApi.history(),
+        interviewApi.analytics().catch((err) => {
+          if (err instanceof HttpError && err.status === 401) throw err;
+          return null; // analytics are optional
+        }),
+      ]);
+      setLoad({ status: "ready", data, analytics });
+    } catch (err) {
+      // 401 → apiFetch already redirected to the (locale-aware) login page
+      if (err instanceof HttpError && err.status === 401) return;
+      setLoad({ status: "error" });
+    }
+  }, []);
 
-  const { interviews, user } = data as NonNullable<typeof data>;
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  if (load.status !== "ready") {
+    return (
+      <div className="min-h-screen bg-background">
+        <HistoryNav />
+        <main className="max-w-3xl mx-auto px-4 py-8">
+          {load.status === "loading" ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <Card className="border border-border/60 rounded-2xl">
+              <CardContent className="py-12 text-center space-y-2">
+                <AlertCircle className="w-8 h-8 text-destructive mx-auto" />
+                <p className="text-sm text-muted-foreground">{t("loadError")}</p>
+                <Button size="sm" variant="outline" className="mt-2 gap-1.5" onClick={() => void fetchData()}>
+                  <RotateCcw className="w-4 h-4" />
+                  {t("retry")}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </main>
+      </div>
+    );
+  }
+
+  const { data, analytics } = load;
+  const { interviews, user } = data;
   const completed = interviews.filter((i: HistoryInterview) => i.status === "completed");
   const avgOverall = completed.length
     ? completed.reduce((s: number, i: HistoryInterview) => s + (i.overall ?? 0), 0) / completed.length
@@ -288,6 +284,12 @@ export default async function HistoryPage() {
     strengths: t("strengths"), improvements: t("improvements"), notCompleted: t("notCompleted"),
     technical: tFeedback("technical"), communication: tFeedback("communication"),
     confidence: tFeedback("confidence"), clarity: tFeedback("clarity"),
+  };
+
+  const legend: LegendLabels = {
+    overall: t("legendOverall"),
+    technical: t("legendTechnical"),
+    communication: t("legendCommunication"),
   };
 
   return (
@@ -342,11 +344,11 @@ export default async function HistoryPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                     <BarChart2 className="w-4 h-4 text-primary" />
-                    Progress
+                    {t("progress")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-3 pb-3">
-                  <ProgressChart sessions={analytics.sessions} />
+                  <ProgressChart sessions={analytics.sessions} legend={legend} />
                 </CardContent>
               </Card>
             )}

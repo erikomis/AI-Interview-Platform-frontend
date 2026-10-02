@@ -146,7 +146,15 @@
     "aiIdle":       "Waiting",
     "aiThinking":   "Processing...",
     "aiSpeaking":   "Speaking...",
-    "aiListening":  "Listening"
+    "aiListening":  "Listening",
+    "retryFeedback":    "Try again",
+    "retryingFeedback": "Generating feedback...",
+    "errors": {
+      "offline":             "No connection to the server. Wait for it to reconnect and try again.",
+      "timeout":             "The server is taking too long to respond. Try sending your answer again.",
+      "feedbackFailed":      "Could not generate the interview feedback.",
+      "feedbackRetryFailed": "Failed to generate feedback. Please try again shortly."
+    }
   },
   "feedback": {
     "title":          "Final Result",
@@ -225,6 +233,12 @@
     "levelMid":         "Mid-level",
     "levelSenior":      "Senior",
     "langPt":           "PT-BR",
-    "langEn":           "English"
+    "langEn":           "English",
+    "progress":            "Progress",
+    "legendOverall":       "Overall",
+    "legendTechnical":     "Technical",
+    "legendCommunication": "Communication",
+    "loadError":           "Could not load your history.",
+    "retry":               "Try again"
   }
 }

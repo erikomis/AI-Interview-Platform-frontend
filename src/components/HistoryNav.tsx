@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 export function HistoryNav() {
   const router = useRouter();
   const t = useTranslations("historyNav");
-  const tc = useTranslations("common");
 
   return (
     <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">

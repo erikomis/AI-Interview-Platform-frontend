@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { authApi } from "@/services/auth";
+import { authApi } from "@/services/auth"; // resolves SERVER_BACKEND_URL when run on the server
 import { getTranslations } from "next-intl/server";
 
 const schema = z.object({

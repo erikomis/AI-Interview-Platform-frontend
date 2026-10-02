@@ -4,6 +4,7 @@ import { CheckCircle2, XCircle, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { SERVER_BACKEND_URL } from "@/lib/config";
 
 interface Props {
   searchParams: Promise<{ token?: string }>;
@@ -18,13 +19,10 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
 
   if (token) {
     try {
-      // Use server-side URL (resolves correctly inside Docker via service name)
-      const backendUrl =
-        process.env.BACKEND_URL ??
-        process.env.NEXT_PUBLIC_BACKEND_URL ??
-        'http://localhost:3000';
+      // Server-side URL (resolves correctly inside Docker via service name)
       const res = await fetch(
-        `${backendUrl}/auth/verify-email?token=${encodeURIComponent(token)}`,
+        `${SERVER_BACKEND_URL}/auth/verify-email?token=${encodeURIComponent(token)}`,
+        { cache: "no-store" },
       );
       success = res.ok;
     } catch {
