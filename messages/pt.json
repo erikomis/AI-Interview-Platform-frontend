@@ -5,7 +5,9 @@
   },
   "common": {
     "brand": "AI Interview",
-    "aiName": "Alex"
+    "aiName": "Alex",
+    "interviewerMaleName":   "Alex",
+    "interviewerFemaleName": "Sofia"
   },
   "home": {
     "poweredBy": "Powered by IA",
@@ -19,7 +21,7 @@
       "feedback": { "title": "Feedback detalhado", "desc": "Relatório completo ao final" }
     },
     "stats": {
-      "questions": { "value": "5",    "label": "perguntas por sessão" },
+      "questions": { "value": "5–15", "label": "perguntas por sessão" },
       "language":  { "value": "100%", "label": "em português" },
       "ai":        { "value": "IA",   "label": "feedback inteligente" }
     }
@@ -63,7 +65,11 @@
     "errors": {
       "emailInvalid":  "Email inválido.",
       "nameTooShort":  "Nome deve ter pelo menos 2 caracteres.",
-      "passwordWeak":  "A senha não atende todos os requisitos."
+      "passwordWeak":  "A senha não atende todos os requisitos.",
+      "invalidCredentials": "Email ou senha incorretos.",
+      "emailTaken":         "Já existe uma conta com este email.",
+      "tooManyRequests":    "Muitas tentativas. Aguarde um momento e tente novamente.",
+      "generic":            "Algo deu errado. Tente novamente."
     },
     "forgotPassword":   "Esqueceu a senha?",
     "verifyTitle":      "Verifique seu email",
@@ -83,7 +89,11 @@
     "waitForAI":     "Aguarde a IA...",
     "typeAnswer":    "Digite sua resposta...",
     "recordAudio":   "Gravar resposta por áudio",
-    "sendAnswer":    "Enviar resposta"
+    "sendAnswer":    "Enviar resposta",
+    "micError":         "Não foi possível acessar o microfone.",
+    "unsentRecording":  "Sua gravação não foi enviada.",
+    "resendRecording":  "Reenviar",
+    "discardRecording": "Descartar gravação"
   },
   "video": {
     "cameraOff":          "Câmera desativada",
@@ -93,7 +103,8 @@
     "behavioralAnalysis": "Análise comportamental",
     "eyeContact":         "Contato visual",
     "confidence":         "Confiança",
-    "stressLevel":        "Nível de estresse"
+    "stressLevel":        "Nível de estresse",
+    "cameraError":        "Não foi possível acessar a câmera."
   },
   "interviewForm": {
     "title":            "Iniciar entrevista",
@@ -108,7 +119,7 @@
     "levelSenior":      "Senior",
     "startBtn":         "Começar entrevista",
     "starting":         "Iniciando...",
-    "footer":           "5 perguntas · feedback completo ao final",
+    "footer":           "{count} perguntas · feedback completo ao final",
     "sessionLabel":     "Modo de sessão",
     "sessionModeLabel": "Modo de sessão",
     "sessionPractice":  "Prática (5 perguntas)",
@@ -117,6 +128,9 @@
     "addCv":            "+ Adicionar CV / Currículo",
     "cvLabel":          "Resumo do CV",
     "cvPlaceholder":    "Cole aqui um resumo do seu currículo...",
+    "interviewerLabel":      "Seu entrevistador",
+    "interviewerMaleHint":   "Voz masculina",
+    "interviewerFemaleHint": "Voz feminina",
     "errors": {
       "nameRequired": "Informe seu nome.",
       "roleRequired": "Informe a vaga desejada."
@@ -139,6 +153,7 @@
     "newInterview": "Nova entrevista",
     "history":      "Histórico",
     "interviewer":  "Entrevistador IA",
+    "interviewerFemale": "Entrevistadora IA",
     "candidate":    "Candidato(a)",
     "progress":     "Progresso da entrevista",
     "questions":    "perguntas",
@@ -149,11 +164,25 @@
     "aiListening":  "Ouvindo você",
     "retryFeedback":    "Tentar novamente",
     "retryingFeedback": "Gerando feedback...",
+    "retryStart":       "Tentar novamente",
     "errors": {
       "offline":             "Sem conexão com o servidor. Aguarde a reconexão e tente novamente.",
       "timeout":             "O servidor está demorando demais para responder. Tente enviar sua resposta novamente.",
       "feedbackFailed":      "Não foi possível gerar o feedback da entrevista.",
-      "feedbackRetryFailed": "Falha ao gerar o feedback. Tente novamente em instantes."
+      "feedbackRetryFailed": "Falha ao gerar o feedback. Tente novamente em instantes.",
+      "CONNECTION":           "Não foi possível conectar ao servidor. Tentando novamente...",
+      "RATE_LIMITED":         "Muitas solicitações. Aguarde um momento e tente novamente.",
+      "BUSY":                 "Sua resposta anterior ainda está sendo processada. Aguarde.",
+      "NOT_IN_PROGRESS":      "Esta entrevista não está mais em andamento.",
+      "ALL_ANSWERED":         "Todas as perguntas já foram respondidas.",
+      "INVALID_PAYLOAD":      "A solicitação é inválida. Tente novamente.",
+      "EMPTY_TRANSCRIPT":     "Não conseguimos ouvir nada na sua gravação. Tente novamente.",
+      "TRANSCRIPTION_FAILED": "Não foi possível transcrever seu áudio. Tente novamente ou digite sua resposta.",
+      "AI_UNAVAILABLE":       "O entrevistador de IA está indisponível no momento. Tente novamente em instantes.",
+      "FORBIDDEN":            "Você não tem acesso a esta entrevista.",
+      "NOT_FOUND":            "Entrevista não encontrada.",
+      "INTERNAL":             "Algo deu errado no servidor. Tente novamente.",
+      "generic":              "Algo deu errado. Tente novamente."
     }
   },
   "feedback": {
@@ -168,7 +197,8 @@
     "excellent":      "Excelente",
     "good":           "Bom",
     "average":        "Regular",
-    "needsWork":      "Precisa melhorar"
+    "needsWork":      "Precisa melhorar",
+    "exportPdf":      "Exportar PDF"
   },
   "forgotPassword": {
     "title":        "Esqueceu a senha?",
@@ -189,7 +219,9 @@
     "doneMessage":   "Sua senha foi atualizada. Todas as sessões anteriores foram encerradas.",
     "signIn":        "Entrar com a nova senha",
     "invalidToken":  "Link de redefinição inválido ou expirado.",
-    "weakPassword":  "A senha não atende a todos os requisitos."
+    "weakPassword":  "A senha não atende a todos os requisitos.",
+    "tooManyRequests": "Muitas tentativas. Aguarde um momento e tente novamente.",
+    "genericError":    "Não foi possível atualizar sua senha. Tente novamente."
   },
   "verifyEmail": {
     "successTitle":   "Email verificado!",
@@ -218,7 +250,7 @@
     "pause":          "Pausar",
     "play":           "Reproduzir",
     "next":           "Próximo",
-    "aiLabel":        "Alex (IA)",
+    "aiLabel":        "{name} (IA)",
     "candidateLabel": "Candidato(a)"
   },
   "historyPage": {
@@ -234,6 +266,7 @@
     "levelSenior":      "Senior",
     "langPt":           "PT-BR",
     "langEn":           "English",
+    "interviewerWith":  "com {name}",
     "progress":            "Evolução",
     "legendOverall":       "Geral",
     "legendTechnical":     "Técnico",

@@ -1,3 +1,6 @@
+import { buildVisemeTrack, type VisemeKey, type WordTiming } from './lipsync'
+import { toSpeechText } from './speech-text'
+
 let _audioCtx: AudioContext | null = null
 let _analyser: AnalyserNode | null = null
 
@@ -25,7 +28,19 @@ function detectAudioMime(base64: string): string {
   return 'audio/mpeg'
 }
 
-export const playAudio = (base64: string): Promise<void> => {
+let currentSpeech: { audio: HTMLAudioElement; track: VisemeKey[] | null } | null = null
+
+/** The interviewer audio playing right now, for the avatar's lip-sync. */
+export const getSpeech = (): { time: number; track: VisemeKey[] | null } | null =>
+  currentSpeech ? { time: currentSpeech.audio.currentTime, track: currentSpeech.track } : null
+
+interface PlayAudioOptions {
+  /** Word timings from the server TTS — enables viseme lip-sync */
+  words?: WordTiming[] | null
+  language?: string
+}
+
+export const playAudio = (base64: string, opts: PlayAudioOptions = {}): Promise<void> => {
   return new Promise((resolve) => {
     const mime = detectAudioMime(base64)
     const audio = new Audio(`data:${mime};base64,${base64}`)
@@ -37,9 +52,15 @@ export const playAudio = (base64: string): Promise<void> => {
     } catch {
       // play without analysis on error
     }
-    audio.onended = () => resolve()
-    audio.onerror = () => resolve()
-    audio.play().catch(() => resolve())
+    const lang = opts.language?.startsWith('en') ? 'en' : 'pt'
+    currentSpeech = { audio, track: opts.words?.length ? buildVisemeTrack(opts.words, lang) : null }
+    const done = () => {
+      if (currentSpeech?.audio === audio) currentSpeech = null
+      resolve()
+    }
+    audio.onended = done
+    audio.onerror = done
+    audio.play().catch(done)
   })
 }
 
@@ -84,6 +105,8 @@ function waitForVoices(): Promise<void> {
 /** Speaks text with the browser TTS. `language` is the interview language ("pt" | "en"). */
 export const speakText = async (text: string, language = 'pt'): Promise<void> => {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
+  text = toSpeechText(text)
+  if (!text) return
   await waitForVoices()
 
   return new Promise((resolve) => {
