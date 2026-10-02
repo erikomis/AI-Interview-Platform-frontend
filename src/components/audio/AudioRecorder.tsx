@@ -11,8 +11,9 @@ import type { AIStatus } from "@/types/interview";
 
 interface AudioRecorderProps {
   aiStatus: AIStatus;
-  onSendText: (text: string) => void;
-  onSendAudio: (blob: Blob) => void;
+  /** Return false when the answer could not be sent (e.g. offline) to keep the input. */
+  onSendText: (text: string) => boolean | void;
+  onSendAudio: (blob: Blob) => boolean | void;
   disabled?: boolean;
 }
 
@@ -40,7 +41,7 @@ export function AudioRecorder({ aiStatus, onSendText, onSendAudio, disabled }: A
   const handleToggleRecording = async () => {
     if (isRecording) {
       const blob = await stopRecording();
-      if (blob) onSendAudio(blob);
+      if (blob.size > 0) onSendAudio(blob);
     } else {
       await startRecording();
     }
@@ -49,7 +50,7 @@ export function AudioRecorder({ aiStatus, onSendText, onSendAudio, disabled }: A
   const handleSendText = () => {
     const trimmed = textInput.trim();
     if (!trimmed) return;
-    onSendText(trimmed);
+    if (onSendText(trimmed) === false) return;
     setTextInput("");
   };
 

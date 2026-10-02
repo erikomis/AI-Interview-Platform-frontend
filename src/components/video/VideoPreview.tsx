@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Camera, CameraOff, Eye, AlertCircle } from "lucide-react";
 import { useWebcam } from "@/hooks/useWebcam";
@@ -17,14 +17,21 @@ export function VideoPreview({ visionMetrics, onFrameCapture }: VideoPreviewProp
   const { videoRef, isActive, error, startCamera, stopCamera, captureFrame } = useWebcam();
   const t = useTranslations("video");
 
+  // Keep the latest callback in a ref so a new function identity doesn't reset the interval
+  const onFrameCaptureRef = useRef(onFrameCapture);
   useEffect(() => {
-    if (!isActive || !onFrameCapture) return;
+    onFrameCaptureRef.current = onFrameCapture;
+  }, [onFrameCapture]);
+  const capturing = !!onFrameCapture;
+
+  useEffect(() => {
+    if (!isActive || !capturing) return;
     const interval = setInterval(() => {
       const frame = captureFrame();
-      if (frame) onFrameCapture(frame);
+      if (frame) onFrameCaptureRef.current?.(frame);
     }, 3000);
     return () => clearInterval(interval);
-  }, [isActive, onFrameCapture, captureFrame]);
+  }, [isActive, capturing, captureFrame]);
 
   const metricColor = (value: number) => {
     if (value >= 0.7) return "text-emerald-500";

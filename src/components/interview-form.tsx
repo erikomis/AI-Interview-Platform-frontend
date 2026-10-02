@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { clearInterviewSession } from "@/hooks/useWebSocket";
 import { Briefcase, User, ArrowRight, Loader2, Globe, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,6 +101,8 @@ export function InterviewForm() {
     sessionStorage.setItem("candidateLevel",    result.data.level);
     sessionStorage.setItem("sessionMode",       sessionMode);
     sessionStorage.setItem("cvSummary",         cvSummary);
+    // Drop any previous (possibly completed) interview state before starting a new one
+    clearInterviewSession();
     router.push("/interview");
   };
 

@@ -119,3 +119,8 @@ export interface AnalyticsData {
   } | null;
   totalSessions: number;
 }
+
+export interface FeedbackFailedEvent {
+  interviewId: string;
+  message: string;
+}

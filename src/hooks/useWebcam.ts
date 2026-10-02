@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 export const useWebcam = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -11,6 +11,7 @@ export const useWebcam = () => {
   const startCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -29,8 +30,16 @@ export const useWebcam = () => {
     setIsActive(false);
   }, []);
 
+  // Release the camera on unmount
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    };
+  }, []);
+
   const captureFrame = useCallback((): string | null => {
-    if (!videoRef.current) return null;
+    if (!videoRef.current || !videoRef.current.videoWidth) return null;
     const canvas = document.createElement("canvas");
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;

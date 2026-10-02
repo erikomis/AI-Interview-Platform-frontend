@@ -43,46 +43,69 @@ export const playAudio = (base64: string): Promise<void> => {
   })
 }
 
-function getBestVoice(): SpeechSynthesisVoice | null {
+function speechLang(language: string): string {
+  return language.startsWith('en') ? 'en-US' : 'pt-BR'
+}
+
+function getBestVoice(lang: string): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices()
   if (!voices.length) return null
-  // Priority: Microsoft/Edge pt-BR > any pt-BR (non-Google) > any pt-BR > any pt
+  const base = lang.split('-')[0]
+  // Priority: Microsoft/Edge <lang> > any <lang> (non-Google) > any <lang> > any same base language
   return (
-    voices.find((v) => v.lang === 'pt-BR' && v.name.toLowerCase().includes('microsoft')) ||
-    voices.find((v) => v.lang === 'pt-BR' && !v.name.toLowerCase().includes('google')) ||
-    voices.find((v) => v.lang === 'pt-BR') ||
-    voices.find((v) => v.lang.startsWith('pt')) ||
+    voices.find((v) => v.lang === lang && v.name.toLowerCase().includes('microsoft')) ||
+    voices.find((v) => v.lang === lang && !v.name.toLowerCase().includes('google')) ||
+    voices.find((v) => v.lang === lang) ||
+    voices.find((v) => v.lang.startsWith(base)) ||
     null
   )
 }
 
-export const speakText = (text: string): Promise<void> => {
+const VOICES_TIMEOUT_MS = 1500
+
+/** Resolves once voices are available (or after a timeout — Safari/Firefox may never fire voiceschanged). */
+function waitForVoices(): Promise<void> {
   return new Promise((resolve) => {
-    if (!window.speechSynthesis) { resolve(); return }
-    window.speechSynthesis.cancel()
-
-    const speak = () => {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'pt-BR'
-      utterance.rate = 0.88
-      utterance.pitch = 1.05
-      utterance.volume = 1.0
-      const voice = getBestVoice()
-      if (voice) utterance.voice = voice
-      utterance.onend = () => resolve()
-      utterance.onerror = () => resolve()
-      window.speechSynthesis.speak(utterance)
+    const synth = window.speechSynthesis
+    if (synth.getVoices().length > 0) { resolve(); return }
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      synth.removeEventListener('voiceschanged', finish)
+      resolve()
     }
+    const timer = setTimeout(finish, VOICES_TIMEOUT_MS)
+    synth.addEventListener('voiceschanged', finish)
+  })
+}
 
-    // Chrome loads voices asynchronously — wait if not ready yet
-    if (window.speechSynthesis.getVoices().length > 0) {
-      speak()
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null
-        speak()
-      }
-    }
+/** Speaks text with the browser TTS. `language` is the interview language ("pt" | "en"). */
+export const speakText = async (text: string, language = 'pt'): Promise<void> => {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return
+  await waitForVoices()
+
+  return new Promise((resolve) => {
+    const synth = window.speechSynthesis
+    synth.cancel()
+
+    const lang = speechLang(language)
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = lang
+    utterance.rate = 0.88
+    utterance.pitch = 1.05
+    utterance.volume = 1.0
+    const voice = getBestVoice(lang)
+    if (voice) utterance.voice = voice
+
+    // Safety net: some browsers never fire onend (e.g. cancelled or blocked speech)
+    const maxMs = Math.max(10_000, text.length * 150)
+    const timer = setTimeout(() => resolve(), maxMs)
+    const done = () => { clearTimeout(timer); resolve() }
+    utterance.onend = done
+    utterance.onerror = done
+    synth.speak(utterance)
   })
 }
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Bot, Wifi, WifiOff, RotateCcw, CheckCircle2, AlertCircle, History } from "lucide-react";
+import { Bot, Wifi, WifiOff, RotateCcw, CheckCircle2, AlertCircle, History, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useWebSocket, clearInterviewSession } from "@/hooks/useWebSocket";
 import { VideoPreview } from "@/components/video/VideoPreview";
@@ -37,9 +37,10 @@ export function InterviewClient() {
 
   const {
     isConnected, interviewId, messages, feedback, visionMetrics,
-    visionHistory, aiStatus, isComplete, socketError,
-    startInterview, sendAnswer, sendAudioAnswer, sendVisionMetrics,
-  } = useWebSocket(!!user);
+    visionHistory, aiStatus, isComplete, socketError, clientError,
+    feedbackFailed, feedbackRetrying,
+    startInterview, sendAnswer, sendAudioAnswer, sendVisionMetrics, retryFeedback,
+  } = useWebSocket(!!user, candidateLanguage);
 
   useEffect(() => { console.log("[WS] isConnected:", isConnected); }, [isConnected]);
   useEffect(() => { console.log("[WS] interviewId:", interviewId); }, [interviewId]);
@@ -53,7 +54,7 @@ export function InterviewClient() {
   // Redirect to login if session expires mid-interview
   useEffect(() => {
     if (!user && started) {
-      router.replace("/login");
+      router.replace("/login?next=/interview");
     }
   }, [user, started, router]);
 
@@ -74,21 +75,27 @@ export function InterviewClient() {
     setCvSummary(cv);
   }, [router]);
 
+  // If the connection drops before the server created the interview, the
+  // start_interview request may be lost — allow it to be re-emitted on reconnect.
+  useEffect(() => {
+    if (!isConnected && !interviewId) startedRef.current = false;
+  }, [isConnected, interviewId]);
+
   useEffect(() => {
     if (isConnected && candidateName && candidateRole && !startedRef.current) {
       startedRef.current = true;
       setStarted(true);
       if (!interviewId) {
-        startInterview(candidateName, candidateRole, candidateLanguage, candidateLevel, sessionMode, cvSummary);
+        const sent = startInterview(candidateName, candidateRole, candidateLanguage, candidateLevel, sessionMode, cvSummary);
+        if (!sent) startedRef.current = false;
       }
     }
   }, [isConnected, candidateName, candidateRole, candidateLanguage, candidateLevel, sessionMode, cvSummary, startInterview, interviewId]);
 
-  const handleFrameCapture = (frame: string) => {
-    if (!interviewId) { console.warn("[VISION] no interviewId — skipping"); return; }
-    console.log("[VISION] sending frame, interviewId:", interviewId);
+  const handleFrameCapture = useCallback((frame: string) => {
+    if (!interviewId) return;
     sendVisionMetrics(frame);
-  };
+  }, [interviewId, sendVisionMetrics]);
 
   const handleRestart = () => {
     sessionStorage.removeItem("candidateName");
@@ -209,10 +216,23 @@ export function InterviewClient() {
         </aside>
 
         <div className="flex flex-col gap-4 min-h-0">
-          {socketError && (
+          {(clientError || socketError) && (
             <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 flex items-center gap-2 text-sm text-destructive animate-fade-in">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              {socketError}
+              {clientError ? t(`errors.${clientError}`) : socketError}
+            </div>
+          )}
+
+          {feedbackFailed && !isComplete && (
+            <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 flex items-center justify-between gap-3 text-sm text-destructive animate-fade-in">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{t("errors.feedbackFailed")}</span>
+              </div>
+              <Button size="sm" variant="outline" onClick={retryFeedback} disabled={feedbackRetrying} className="gap-1.5 shrink-0">
+                {feedbackRetrying ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                {feedbackRetrying ? t("retryingFeedback") : t("retryFeedback")}
+              </Button>
             </div>
           )}
 
@@ -234,15 +254,9 @@ export function InterviewClient() {
               <div className="rounded-xl border bg-card p-4">
                 <AudioRecorder
                   aiStatus={aiStatus}
-                  onSendText={(text) => {
-                    console.log("[ANSWER] sendAnswer (text):", text);
-                    sendAnswer(text, visionMetrics ?? undefined);
-                  }}
-                  onSendAudio={(blob) => {
-                    console.log("[ANSWER] sendAudioAnswer (blob):", blob.size);
-                    sendAudioAnswer(blob, visionMetrics ?? undefined, candidateLanguage);
-                  }}
-                  disabled={isComplete || !started}
+                  onSendText={(text) => sendAnswer(text, visionMetrics ?? undefined)}
+                  onSendAudio={(blob) => sendAudioAnswer(blob, visionMetrics ?? undefined, candidateLanguage)}
+                  disabled={isComplete || !started || !!feedbackFailed}
                 />
               </div>
             </>
