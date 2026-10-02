@@ -55,7 +55,16 @@ export function refreshSession(): Promise<boolean> {
       method: 'POST',
       credentials: 'include',
     })
-      .then((res) => res.ok)
+      .then(async (res) => {
+        if (res.ok) return true;
+        // 409 "Token already rotated": another tab won the race and already set
+        // fresh cookies — confirm the session is usable before giving up.
+        if (res.status === 409) {
+          const me = await fetch(`${getBackendUrl()}/auth/me`, { credentials: 'include', cache: 'no-store' });
+          return me.ok;
+        }
+        return false;
+      })
       .catch(() => false)
       .finally(() => {
         refreshPromise = null;

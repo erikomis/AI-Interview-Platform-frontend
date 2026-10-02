@@ -1,6 +1,7 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useReducer, useRef, useState } from "react";
+import Image from "next/image";
 import { z } from "zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
@@ -12,11 +13,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import type { InterviewerPersona } from "@/types/interview";
 
 // ── Types & schema ─────────────────────────────────────────────────────────────
 
 type ExperienceLevel = "junior" | "mid" | "senior";
 type SessionMode = "practice" | "full" | "intensive";
+
+const SESSION_QUESTIONS: Record<SessionMode, number> = { practice: 5, full: 10, intensive: 15 };
+
+const INTERVIEWERS: { value: InterviewerPersona; photo: string }[] = [
+  { value: "male",   photo: "/avatar/interviewer.jpg" },
+  { value: "female", photo: "/avatar/interviewer-female.jpg" },
+];
 
 const schema = z.object({
   name:  z.string().trim().min(1),
@@ -31,6 +40,7 @@ type State = {
   role:        string;
   level:       ExperienceLevel;
   sessionMode: SessionMode;
+  interviewer: InterviewerPersona;
   cvSummary:   string;
   loading:     boolean;
   error:       string | null;
@@ -41,6 +51,7 @@ type Action =
   | { type: "SET_ROLE";         value: string }
   | { type: "SET_LEVEL";        value: ExperienceLevel }
   | { type: "SET_SESSION_MODE"; value: SessionMode }
+  | { type: "SET_INTERVIEWER";  value: InterviewerPersona }
   | { type: "SET_CV_SUMMARY";   value: string }
   | { type: "RESET_ROLE" }
   | { type: "START" }
@@ -52,6 +63,7 @@ function reducer(s: State, a: Action): State {
     case "SET_ROLE":         return { ...s, role: a.value, error: null };
     case "SET_LEVEL":        return { ...s, level: a.value };
     case "SET_SESSION_MODE": return { ...s, sessionMode: a.value };
+    case "SET_INTERVIEWER":  return { ...s, interviewer: a.value };
     case "SET_CV_SUMMARY":   return { ...s, cvSummary: a.value };
     case "RESET_ROLE":       return { ...s, role: "" };
     case "START":            return { ...s, loading: true, error: null };
@@ -59,7 +71,7 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const initial: State = { name: "", role: "", level: "mid", sessionMode: "full", cvSummary: "", loading: false, error: null };
+const initial: State = { name: "", role: "", level: "mid", sessionMode: "full", interviewer: "male", cvSummary: "", loading: false, error: null };
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
@@ -68,11 +80,23 @@ export function InterviewForm() {
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("interviewForm");
+  const tc = useTranslations("common");
   const { user } = useAuth();
 
   const [state, dispatch] = useReducer(reducer, initial);
-  const { name, role, level, sessionMode, cvSummary, loading, error } = state;
+  const { name, role, level, sessionMode, interviewer, cvSummary, loading, error } = state;
   const [cvOpen, setCvOpen] = useState(false);
+  const interviewerRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Radio group keyboard support: arrows move (and select), roving tabindex
+  const handleInterviewerKeyDown = (e: React.KeyboardEvent, index: number) => {
+    const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const next = (index + step + INTERVIEWERS.length) % INTERVIEWERS.length;
+    dispatch({ type: "SET_INTERVIEWER", value: INTERVIEWERS[next].value });
+    interviewerRefs.current[next]?.focus();
+  };
 
   const handleLangSwitch = (newLocale: string) => {
     if (newLocale === locale) return;
@@ -100,6 +124,7 @@ export function InterviewForm() {
     sessionStorage.setItem("candidateLanguage", locale);
     sessionStorage.setItem("candidateLevel",    result.data.level);
     sessionStorage.setItem("sessionMode",       sessionMode);
+    sessionStorage.setItem("interviewer",       interviewer);
     sessionStorage.setItem("cvSummary",         cvSummary);
     // Drop any previous (possibly completed) interview state before starting a new one
     clearInterviewSession();
@@ -244,6 +269,55 @@ export function InterviewForm() {
         </div>
 
         <div className="space-y-1.5">
+          <Label id="interviewer-label" className="text-sm font-medium">{t("interviewerLabel")}</Label>
+          <div role="radiogroup" aria-labelledby="interviewer-label" className="grid grid-cols-2 gap-2">
+            {INTERVIEWERS.map((opt, i) => {
+              const selected = interviewer === opt.value;
+              const personaName = tc(opt.value === "female" ? "interviewerFemaleName" : "interviewerMaleName");
+              return (
+                <button
+                  key={opt.value}
+                  ref={(el) => { interviewerRefs.current[i] = el; }}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => dispatch({ type: "SET_INTERVIEWER", value: opt.value })}
+                  onKeyDown={(e) => handleInterviewerKeyDown(e, i)}
+                  className={cn(
+                    "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all duration-150",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    selected
+                      ? "bg-primary/10 border-primary shadow-sm shadow-primary/20"
+                      : "bg-muted/40 hover:bg-muted border-border/60 hover:border-border"
+                  )}
+                >
+                  <Image
+                    src={opt.photo}
+                    alt=""
+                    width={44}
+                    height={44}
+                    unoptimized
+                    className={cn(
+                      "w-11 h-11 rounded-full object-cover shrink-0 ring-2 transition-all",
+                      selected ? "ring-primary" : "ring-transparent"
+                    )}
+                  />
+                  <span className="min-w-0">
+                    <span className={cn("block text-sm font-semibold", selected ? "text-foreground" : "text-muted-foreground")}>
+                      {personaName}
+                    </span>
+                    <span className="block text-xs text-muted-foreground truncate">
+                      {opt.value === "female" ? t("interviewerFemaleHint") : t("interviewerMaleHint")}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
           <button
             type="button"
             onClick={() => setCvOpen((v) => !v)}
@@ -288,7 +362,7 @@ export function InterviewForm() {
           )}
         </Button>
 
-        <p className="text-xs text-center text-muted-foreground/70">{t("footer")}</p>
+        <p className="text-xs text-center text-muted-foreground/70">{t("footer", { count: SESSION_QUESTIONS[sessionMode] })}</p>
       </CardContent>
     </Card>
   );

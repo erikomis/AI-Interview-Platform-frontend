@@ -1,9 +1,14 @@
+import type { WordTiming } from "@/utils/lipsync";
 export type InterviewStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+
+export type InterviewerPersona = "male" | "female";
 
 export interface VisionMetrics {
   eye_contact: number;
   stress_level: number;
   confidence: number;
+  /** Set by the vision service; frames without a visible face carry no signal. */
+  face_visible?: boolean;
 }
 
 export interface InterviewMessage {
@@ -11,6 +16,10 @@ export interface InterviewMessage {
   content: string;
   timestamp: Date;
   audioUrl?: string;
+  /** Client-side id for optimistic (not yet acknowledged) candidate messages */
+  id?: string;
+  /** True until the server acknowledges the answer; rolled back on error */
+  pending?: boolean;
 }
 
 export interface InterviewFeedback {
@@ -43,11 +52,17 @@ export interface AiQuestionEvent {
   interviewId: string;
   question: string;
   audioBase64: string | null;
+  /** Word timings (ms) of the audio, for avatar lip-sync */
+  words?: WordTiming[] | null;
 }
 
 export interface AiResponseEvent {
   interviewId: string;
   response: string;
+  /** Neural TTS of `response`; null when the server's TTS is unavailable */
+  audioBase64?: string | null;
+  /** Word timings (ms) of the audio, for avatar lip-sync */
+  words?: WordTiming[] | null;
 }
 
 export interface TranscriptEvent {
@@ -67,11 +82,48 @@ export interface FinalFeedbackEvent {
 
 export type AIStatus = "idle" | "thinking" | "speaking" | "listening";
 
+/** Sent right after connect: `exp` of the handshake access token (unix seconds). */
+export interface SessionInfoEvent {
+  exp: number;
+}
+
+export type ServerErrorCode =
+  | "RATE_LIMITED"
+  | "BUSY"
+  | "NOT_IN_PROGRESS"
+  | "ALL_ANSWERED"
+  | "INVALID_PAYLOAD"
+  | "EMPTY_TRANSCRIPT"
+  | "TRANSCRIPTION_FAILED"
+  | "AI_UNAVAILABLE"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "INTERNAL";
+
+export interface ServerErrorEvent {
+  message: string;
+  code?: ServerErrorCode;
+}
+
+/** GET /interviews/:id */
+export interface InterviewDetails {
+  id: string;
+  role: string;
+  language: string;
+  experienceLevel: string;
+  status: InterviewStatus;
+  maxQuestions?: number;
+  interviewer?: InterviewerPersona | null;
+  messages: { role: "interviewer" | "candidate"; content: string; timestamp: string }[];
+  feedback: InterviewFeedback | null;
+}
+
 export interface HistoryInterview {
   id: string;
   role: string;
   language: string;
   experienceLevel: string;
+  interviewer?: InterviewerPersona | null;
   status: string;
   createdAt: string;
   completedAt: string | null;

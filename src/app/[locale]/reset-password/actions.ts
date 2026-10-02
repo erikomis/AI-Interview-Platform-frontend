@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { authApi } from "@/services/auth"; // resolves SERVER_BACKEND_URL when run on the server
+import { authApi, HttpError } from "@/services/auth"; // resolves SERVER_BACKEND_URL when run on the server
 import { getTranslations } from "next-intl/server";
 
 const schema = z.object({
@@ -44,6 +44,12 @@ export async function resetPasswordAction(
     await authApi.resetPassword(parsed.data.token, parsed.data.password);
     return { status: "success" };
   } catch (err) {
-    return { status: "error", message: (err as Error).message };
+    // Map backend errors to localized, generic messages
+    const status = err instanceof HttpError ? err.status : 0;
+    const message =
+      status === 400 || status === 401 || status === 404 ? t("invalidToken") :
+      status === 429 ? t("tooManyRequests") :
+      t("genericError");
+    return { status: "error", message };
   }
 }

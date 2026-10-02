@@ -10,11 +10,13 @@ import type { InterviewMessage } from "@/types/interview";
 
 interface InterviewReplayProps {
   messages: InterviewMessage[];
+  /** Display name of the interviewer persona */
+  interviewerName: string;
 }
 
 const STEP_DELAY_MS = 1800;
 
-export function InterviewReplay({ messages }: InterviewReplayProps) {
+export function InterviewReplay({ messages, interviewerName }: InterviewReplayProps) {
   const [cursor, setCursor] = useState(0);
   const [playing, setPlaying] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -126,7 +128,7 @@ export function InterviewReplay({ messages }: InterviewReplayProps) {
                 >
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span className="text-xs font-medium opacity-70">
-                      {isInterviewer ? t("aiLabel") : t("candidateLabel")}
+                      {isInterviewer ? t("aiLabel", { name: interviewerName }) : t("candidateLabel")}
                     </span>
                     <span className="text-[10px] opacity-50">{formatTimestamp(msg.timestamp)}</span>
                   </div>

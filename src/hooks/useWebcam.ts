@@ -2,11 +2,14 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 
+/** Error key; the UI translates it. */
+export type WebcamError = "unavailable";
+
 export const useWebcam = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [isActive, setIsActive] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<WebcamError | null>(null);
 
   const startCamera = useCallback(async () => {
     try {
@@ -19,7 +22,7 @@ export const useWebcam = () => {
       setIsActive(true);
       setError(null);
     } catch {
-      setError("Não foi possível acessar a câmera.");
+      setError("unavailable");
     }
   }, []);
 

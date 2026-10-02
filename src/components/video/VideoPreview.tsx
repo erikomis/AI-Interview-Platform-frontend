@@ -33,22 +33,25 @@ export function VideoPreview({ visionMetrics, onFrameCapture }: VideoPreviewProp
     return () => clearInterval(interval);
   }, [isActive, capturing, captureFrame]);
 
-  const metricColor = (value: number) => {
-    if (value >= 0.7) return "text-emerald-500";
-    if (value >= 0.4) return "text-amber-500";
+  // `inverted`: higher is worse (stress), so the colour scale flips
+  const metricColor = (value: number, inverted = false) => {
+    const v = inverted ? 1 - value : value;
+    if (v >= 0.7) return "text-emerald-500";
+    if (v >= 0.4) return "text-amber-500";
     return "text-red-500";
   };
 
-  const metricBar = (value: number) => {
-    if (value >= 0.7) return "bg-emerald-500";
-    if (value >= 0.4) return "bg-amber-500";
+  const metricBar = (value: number, inverted = false) => {
+    const v = inverted ? 1 - value : value;
+    if (v >= 0.7) return "bg-emerald-500";
+    if (v >= 0.4) return "bg-amber-500";
     return "bg-red-500";
   };
 
   const metrics = [
-    { label: t("eyeContact"),  value: visionMetrics?.eye_contact ?? 0 },
-    { label: t("confidence"),  value: visionMetrics?.confidence ?? 0 },
-    { label: t("stressLevel"), value: visionMetrics ? 1 - visionMetrics.stress_level : 0 },
+    { label: t("eyeContact"),  value: visionMetrics?.eye_contact ?? 0,  inverted: false },
+    { label: t("confidence"),  value: visionMetrics?.confidence ?? 0,   inverted: false },
+    { label: t("stressLevel"), value: visionMetrics?.stress_level ?? 0, inverted: true },
   ];
 
   return (
@@ -83,7 +86,7 @@ export function VideoPreview({ visionMetrics, onFrameCapture }: VideoPreviewProp
           <div className="absolute bottom-2 left-2 right-2">
             <div className="bg-destructive/90 text-destructive-foreground text-xs rounded-lg px-3 py-1.5 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              {error}
+              {t("cameraError")}
             </div>
           </div>
         )}
@@ -111,15 +114,15 @@ export function VideoPreview({ visionMetrics, onFrameCapture }: VideoPreviewProp
             {t("behavioralAnalysis")}
           </div>
 
-          {metrics.map(({ label, value }) => (
+          {metrics.map(({ label, value, inverted }) => (
             <div key={label} className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">{label}</span>
-                <span className={metricColor(value)}>{Math.round(value * 100)}%</span>
+                <span className={metricColor(value, inverted)}>{Math.round(value * 100)}%</span>
               </div>
               <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${metricBar(value)}`}
+                  className={`h-full rounded-full transition-all duration-500 ${metricBar(value, inverted)}`}
                   style={{ width: `${value * 100}%` }}
                 />
               </div>

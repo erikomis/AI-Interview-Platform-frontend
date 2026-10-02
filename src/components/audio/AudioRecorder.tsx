@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Mic, MicOff, Send, Loader2 } from "lucide-react";
+import { Mic, MicOff, Send, Loader2, RotateCcw, Trash2 } from "lucide-react";
 import { useMicrophone } from "@/hooks/useMicrophone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,16 +15,31 @@ interface AudioRecorderProps {
   onSendText: (text: string) => boolean | void;
   onSendAudio: (blob: Blob) => boolean | void;
   disabled?: boolean;
+  /** Text answer the server rejected — restored into the input so it can be resent. */
+  failedText?: string | null;
+  /** Recording the server rejected — kept so the user can resend it. */
+  failedAudio?: Blob | null;
+  onDiscardFailed?: () => void;
 }
 
-export function AudioRecorder({ aiStatus, onSendText, onSendAudio, disabled }: AudioRecorderProps) {
+export function AudioRecorder({
+  aiStatus, onSendText, onSendAudio, disabled, failedText, failedAudio, onDiscardFailed,
+}: AudioRecorderProps) {
   const [textInput, setTextInput] = useState("");
   const [recordingTime, setRecordingTime] = useState(0);
+  // Recording that could not be sent (e.g. offline) — never thrown away silently
+  const [unsentBlob, setUnsentBlob] = useState<Blob | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { isRecording, error, startRecording, stopRecording } = useMicrophone();
   const t = useTranslations("audio");
 
   const isDisabled = disabled || aiStatus === "thinking" || aiStatus === "speaking";
+  const retryBlob = unsentBlob ?? failedAudio ?? null;
+
+  // Put a rejected text answer back into an empty input
+  useEffect(() => {
+    if (failedText) setTextInput((prev) => prev || failedText);
+  }, [failedText]);
 
   useEffect(() => {
     if (isRecording) {
@@ -41,10 +56,25 @@ export function AudioRecorder({ aiStatus, onSendText, onSendAudio, disabled }: A
   const handleToggleRecording = async () => {
     if (isRecording) {
       const blob = await stopRecording();
-      if (blob.size > 0) onSendAudio(blob);
+      if (blob.size === 0) return;
+      setUnsentBlob(onSendAudio(blob) === false ? blob : null);
     } else {
       await startRecording();
     }
+  };
+
+  const handleResendAudio = () => {
+    if (!retryBlob) return;
+    if (onSendAudio(retryBlob) === false) {
+      setUnsentBlob(retryBlob);
+      return;
+    }
+    setUnsentBlob(null);
+  };
+
+  const handleDiscardAudio = () => {
+    setUnsentBlob(null);
+    onDiscardFailed?.();
   };
 
   const handleSendText = () => {
@@ -105,6 +135,22 @@ export function AudioRecorder({ aiStatus, onSendText, onSendAudio, disabled }: A
         </div>
       )}
 
+      {/* Recording that failed to send */}
+      {retryBlob && !isRecording && (
+        <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 flex items-center justify-between gap-3">
+          <span className="text-sm text-amber-600 dark:text-amber-400">{t("unsentRecording")}</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button size="sm" variant="outline" onClick={handleResendAudio} disabled={isDisabled} className="gap-1.5">
+              <RotateCcw className="w-4 h-4" />
+              {t("resendRecording")}
+            </Button>
+            <Button size="icon" variant="ghost" onClick={handleDiscardAudio} title={t("discardRecording")} aria-label={t("discardRecording")}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Text input + controls */}
       {!isRecording && (
         <div className="flex gap-2">
@@ -149,7 +195,7 @@ export function AudioRecorder({ aiStatus, onSendText, onSendAudio, disabled }: A
       )}
 
       {error && (
-        <p className="text-xs text-destructive text-center">{error}</p>
+        <p className="text-xs text-destructive text-center">{t("micError")}</p>
       )}
     </div>
   );

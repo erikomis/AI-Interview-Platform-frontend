@@ -39,8 +39,13 @@ export function InterviewChat({ messages, aiThinking }: InterviewChatProps) {
     <div className="flex flex-col gap-4 py-2">
       {messages.map((msg, i) => (
         <div
-          key={i}
-          className={cn("flex gap-3 animate-slide-up", msg.role === "candidate" && "flex-row-reverse")}
+          key={msg.id ?? i}
+          className={cn(
+            "flex gap-3 animate-slide-up",
+            msg.role === "candidate" && "flex-row-reverse",
+            msg.pending && "opacity-70"
+          )}
+          aria-busy={msg.pending || undefined}
         >
           <div
             className={cn(

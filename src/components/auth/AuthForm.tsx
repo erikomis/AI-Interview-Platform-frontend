@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { authApi } from "@/services/auth";
+import { authApi, HttpError } from "@/services/auth";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 
 // ── Zod schemas ────────────────────────────────────────────────────────────────
@@ -143,7 +143,14 @@ export function AuthForm({ mode }: AuthFormProps) {
         router.replace(safeNextPath(new URLSearchParams(window.location.search).get("next")));
       }
     } catch (err) {
-      dispatch({ type: "SUBMIT_ERR", message: (err as Error).message });
+      // Backend messages are English-only and may leak details — show a localized, generic one
+      const status = err instanceof HttpError ? err.status : 0;
+      const msg =
+        status === 401 && !isRegister ? t("errors.invalidCredentials") :
+        status === 409 && isRegister  ? t("errors.emailTaken") :
+        status === 429                ? t("errors.tooManyRequests") :
+                                        t("errors.generic");
+      dispatch({ type: "SUBMIT_ERR", message: msg });
     }
   };
 

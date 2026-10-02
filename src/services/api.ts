@@ -2,6 +2,7 @@ import type {
   StartInterviewResponse,
   AnswerResponse,
   InterviewFeedback,
+  InterviewDetails,
   VisionMetrics,
   UserHistory,
   AnalyticsData,
@@ -55,7 +56,7 @@ export const interviewApi = {
     apiFetch<InterviewFeedback>(`/interviews/${id}/feedback`, { method: "POST" }),
 
   get: (id: string) =>
-    apiFetch<unknown>(`/interviews/${id}`),
+    apiFetch<InterviewDetails>(`/interviews/${id}`, { cache: "no-store" }),
 
   history: () =>
     apiFetch<UserHistory>("/interviews/me/history", { cache: "no-store" }),

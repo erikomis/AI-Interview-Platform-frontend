@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Trophy, BarChart2, Clock, Globe, Layers, Loader2, AlertCircle, RotateCcw } from "lucide-react";
+import { Trophy, BarChart2, Clock, Globe, Layers, Loader2, AlertCircle, RotateCcw, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,6 +122,7 @@ function ScoreBadge({ label, value }: { label: string; value: number | null }) {
 type Labels = {
   levelJunior: string; levelMid: string; levelSenior: string;
   langPt: string; langEn: string;
+  interviewerMale: string; interviewerFemale: string;
   strengths: string; improvements: string; notCompleted: string;
   technical: string; communication: string; confidence: string; clarity: string;
 };
@@ -150,6 +151,12 @@ function InterviewCard({ item, locale, labels }: { item: HistoryInterview; local
               <Badge variant="outline" className="text-xs gap-1">
                 <Globe className="w-3 h-3" />{item.language === "en" ? labels.langEn : labels.langPt}
               </Badge>
+              {item.interviewer && (
+                <Badge variant="outline" className="text-xs gap-1">
+                  <UserRound className="w-3 h-3" />
+                  {item.interviewer === "female" ? labels.interviewerFemale : labels.interviewerMale}
+                </Badge>
+              )}
               <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="w-3 h-3" />{date}
               </span>
@@ -219,6 +226,7 @@ export default function HistoryPage() {
   const locale = useLocale();
   const t = useTranslations("historyPage");
   const tFeedback = useTranslations("feedback");
+  const tc = useTranslations("common");
   const [load, setLoad] = useState<LoadState>({ status: "loading" });
 
   // Fetched client-side: the refresh_token cookie is scoped to /auth, so only the
@@ -281,6 +289,8 @@ export default function HistoryPage() {
   const labels: Labels = {
     levelJunior: t("levelJunior"), levelMid: t("levelMid"), levelSenior: t("levelSenior"),
     langPt: t("langPt"), langEn: t("langEn"),
+    interviewerMale: t("interviewerWith", { name: tc("interviewerMaleName") }),
+    interviewerFemale: t("interviewerWith", { name: tc("interviewerFemaleName") }),
     strengths: t("strengths"), improvements: t("improvements"), notCompleted: t("notCompleted"),
     technical: tFeedback("technical"), communication: tFeedback("communication"),
     confidence: tFeedback("confidence"), clarity: tFeedback("clarity"),
