@@ -34,6 +34,13 @@ const registerSchema = z.object({
   password: passwordSchema,
 });
 
+/** Only allow same-origin relative paths (no "//host" or absolute URLs). */
+function safeNextPath(next: string | null): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return "/";
+  // Strip a locale prefix — the locale-aware router adds the current one back
+  return next.replace(/^\/(?:en|pt)(?=\/|$)/, "") || "/";
+}
+
 // ── Reducer ────────────────────────────────────────────────────────────────────
 
 type Status = "idle" | "loading" | "error" | "registered" | "resending" | "resent";
@@ -133,7 +140,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         dispatch({ type: "SUBMIT_OK" });
       } else {
         await login(email.trim().toLowerCase(), password);
-        router.replace("/");
+        router.replace(safeNextPath(new URLSearchParams(window.location.search).get("next")));
       }
     } catch (err) {
       dispatch({ type: "SUBMIT_ERR", message: (err as Error).message });

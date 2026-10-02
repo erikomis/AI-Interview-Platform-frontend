@@ -1,24 +1,22 @@
 import { io, Socket } from "socket.io-client";
-
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "http://localhost:3000";
+import { WS_URL } from "@/lib/config";
 
 let socket: Socket | null = null;
 
+/**
+ * Returns the single shared Socket.IO instance. It is created once and never
+ * recreated just because it is momentarily disconnected — socket.io handles
+ * reconnection itself, and callers decide when to (re)connect.
+ */
 export const getSocket = (): Socket => {
-  if (socket && socket.connected) return socket;
-
-  if (socket) {
-    socket.disconnect();
-    socket = null;
+  if (!socket) {
+    // Cookies (including httpOnly access_token) are sent automatically by the browser
+    socket = io(`${WS_URL}/interview`, {
+      transports: ["websocket", "polling"],
+      withCredentials: true,
+      autoConnect: false,
+    });
   }
-
-  // Cookies (including httpOnly access_token) are sent automatically by the browser
-  socket = io(`${WS_URL}/interview`, {
-    transports: ["websocket", "polling"],
-    withCredentials: true,
-    autoConnect: false,
-  });
-
   return socket;
 };
 

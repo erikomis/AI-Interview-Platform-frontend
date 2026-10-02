@@ -12,6 +12,9 @@ function stripLocale(pathname: string): string {
   return pathname.replace(/^\/(?:en|pt)(?=\/|$)/, "") || "/";
 }
 
+const matches = (path: string, list: string[]) =>
+  list.some((p) => path === p || path.startsWith(p + "/"));
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const path = stripLocale(pathname);
@@ -19,14 +22,14 @@ export function middleware(request: NextRequest) {
 
   const localePrefix = pathname.match(/^\/(?:en|pt)(?=\/|$)/)?.[0] ?? "";
 
-  if (PROTECTED.some((p) => path.startsWith(p)) && !hasSession) {
+  if (matches(path, PROTECTED) && !hasSession) {
     const url = request.nextUrl.clone();
     url.pathname = `${localePrefix}/login`;
     url.searchParams.set("next", path);
     return NextResponse.redirect(url);
   }
 
-  if (AUTH_ONLY.some((p) => path.startsWith(p)) && hasSession) {
+  if (matches(path, AUTH_ONLY) && hasSession) {
     return NextResponse.redirect(new URL(`${localePrefix}/`, request.url));
   }
 

@@ -1,36 +1,40 @@
-import type { StartInterviewResponse, AnswerResponse, InterviewFeedback, VisionMetrics } from "@/types/interview";
+import type {
+  StartInterviewResponse,
+  AnswerResponse,
+  InterviewFeedback,
+  VisionMetrics,
+  UserHistory,
+  AnalyticsData,
+} from "@/types/interview";
+import { BACKEND_URL } from "@/lib/config";
+import { refreshSession, redirectToLogin, HttpError } from "@/services/auth";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3000";
+export async function apiFetch<T>(path: string, init?: RequestInit, isRetry = false): Promise<T> {
+  const headers = new Headers(init?.headers);
+  if (init?.body !== undefined && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
 
-function clearSessionAndRedirect() {
-  document.cookie = "session_hint=; path=/; max-age=0";
-  window.location.href = "/login";
-}
-
-async function apiFetch<T>(path: string, init?: RequestInit, isRetry = false): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+  const res = await fetch(`${BACKEND_URL}${path}`, {
     ...init,
+    credentials: "include",
+    headers,
   });
 
   if (res.status === 401 && !isRetry) {
-    const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
-      method: "POST",
-      credentials: "include",
-    });
-    if (refreshRes.ok) {
+    if (await refreshSession()) {
       return apiFetch<T>(path, init, true);
     }
-    clearSessionAndRedirect();
-    throw new Error("Session expired");
+    redirectToLogin();
+    throw new HttpError(401, "Session expired");
   }
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`${res.status} ${body}`);
+    throw new HttpError(res.status, `${res.status} ${body}`);
   }
 
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -44,10 +48,7 @@ export const interviewApi = {
   answer: (id: string, answer: string, visionMetrics?: VisionMetrics) =>
     apiFetch<AnswerResponse>(`/interviews/${id}/answer`, {
       method: "POST",
-      body: JSON.stringify({
-        answer,
-        visionMetrics: visionMetrics ?? { eye_contact: 0.5, stress_level: 0.3, confidence: 0.7 },
-      }),
+      body: JSON.stringify(visionMetrics ? { answer, visionMetrics } : { answer }),
     }),
 
   feedback: (id: string) =>
@@ -57,5 +58,8 @@ export const interviewApi = {
     apiFetch<unknown>(`/interviews/${id}`),
 
   history: () =>
-    apiFetch<unknown>("/interviews/me/history"),
+    apiFetch<UserHistory>("/interviews/me/history", { cache: "no-store" }),
+
+  analytics: () =>
+    apiFetch<AnalyticsData>("/interviews/me/analytics", { cache: "no-store" }),
 };
