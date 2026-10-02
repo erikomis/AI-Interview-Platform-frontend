@@ -27,7 +27,10 @@ export const useMicrophone = () => {
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Browser-side clean-up of the voice: big accuracy win for speech recognition
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
+      });
       releaseStream();
       streamRef.current = stream;
       const mimeType = pickMimeType();

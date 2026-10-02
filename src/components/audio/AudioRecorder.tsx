@@ -2,10 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Mic, MicOff, Send, Loader2, RotateCcw, Trash2 } from "lucide-react";
+import { Mic, MicOff, Send, Loader2, RotateCcw, Trash2, PencilLine } from "lucide-react";
 import { useMicrophone } from "@/hooks/useMicrophone";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { AIStatus } from "@/types/interview";
 
@@ -14,6 +13,11 @@ interface AudioRecorderProps {
   /** Return false when the answer could not be sent (e.g. offline) to keep the input. */
   onSendText: (text: string) => boolean | void;
   onSendAudio: (blob: Blob) => boolean | void;
+  /**
+   * Speech → text for review. When provided, a recording is transcribed into the
+   * input instead of being sent, so the candidate can fix it before answering.
+   */
+  onTranscribe?: (blob: Blob) => Promise<string>;
   disabled?: boolean;
   /** Text answer the server rejected — restored into the input so it can be resent. */
   failedText?: string | null;
@@ -23,9 +27,13 @@ interface AudioRecorderProps {
 }
 
 export function AudioRecorder({
-  aiStatus, onSendText, onSendAudio, disabled, failedText, failedAudio, onDiscardFailed,
+  aiStatus, onSendText, onSendAudio, onTranscribe, disabled, failedText, failedAudio, onDiscardFailed,
 }: AudioRecorderProps) {
   const [textInput, setTextInput] = useState("");
+  const [transcribing, setTranscribing] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
+  const [transcribeError, setTranscribeError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   // Recording that could not be sent (e.g. offline) — never thrown away silently
   const [unsentBlob, setUnsentBlob] = useState<Blob | null>(null);
@@ -33,7 +41,7 @@ export function AudioRecorder({
   const { isRecording, error, startRecording, stopRecording } = useMicrophone();
   const t = useTranslations("audio");
 
-  const isDisabled = disabled || aiStatus === "thinking" || aiStatus === "speaking";
+  const isDisabled = disabled || transcribing || aiStatus === "thinking" || aiStatus === "speaking";
   const retryBlob = unsentBlob ?? failedAudio ?? null;
 
   // Put a rejected text answer back into an empty input
@@ -53,18 +61,48 @@ export function AudioRecorder({
     };
   }, [isRecording]);
 
+  /** Transcribes into the input; the recording is kept until the text arrives. */
+  const transcribe = async (blob: Blob) => {
+    if (!onTranscribe) return;
+    setTranscribing(true);
+    setTranscribeError(null);
+    try {
+      const text = await onTranscribe(blob);
+      setUnsentBlob(null);
+      setTextInput((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+      setReviewing(true);
+      // Put the caret at the end so the candidate can edit right away
+      requestAnimationFrame(() => {
+        const el = inputRef.current;
+        if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+      });
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      setTranscribeError(code === "EMPTY_TRANSCRIPT" ? "transcribeEmpty" : "transcribeFailed");
+      setUnsentBlob(blob);
+    } finally {
+      setTranscribing(false);
+    }
+  };
+
   const handleToggleRecording = async () => {
     if (isRecording) {
       const blob = await stopRecording();
       if (blob.size === 0) return;
-      setUnsentBlob(onSendAudio(blob) === false ? blob : null);
+      if (onTranscribe) await transcribe(blob);
+      else setUnsentBlob(onSendAudio(blob) === false ? blob : null);
     } else {
+      setTranscribeError(null);
       await startRecording();
     }
   };
 
   const handleResendAudio = () => {
     if (!retryBlob) return;
+    if (onTranscribe) {
+      void transcribe(retryBlob);
+      return;
+    }
     if (onSendAudio(retryBlob) === false) {
       setUnsentBlob(retryBlob);
       return;
@@ -74,6 +112,7 @@ export function AudioRecorder({
 
   const handleDiscardAudio = () => {
     setUnsentBlob(null);
+    setTranscribeError(null);
     onDiscardFailed?.();
   };
 
@@ -82,6 +121,7 @@ export function AudioRecorder({
     if (!trimmed) return;
     if (onSendText(trimmed) === false) return;
     setTextInput("");
+    setReviewing(false);
   };
 
   const formatTime = (s: number) => {
@@ -129,20 +169,36 @@ export function AudioRecorder({
             <span className="text-sm font-mono text-muted-foreground">{formatTime(recordingTime)}</span>
             <Button size="sm" variant="destructive" onClick={handleToggleRecording}>
               <MicOff className="w-4 h-4 mr-1.5" />
-              {t("stopAndSend")}
+              {onTranscribe ? t("stopAndTranscribe") : t("stopAndSend")}
             </Button>
           </div>
         </div>
       )}
 
-      {/* Recording that failed to send */}
-      {retryBlob && !isRecording && (
+      {transcribing && (
+        <div className="rounded-xl bg-primary/5 border border-primary/15 px-4 py-3 flex items-center gap-2 text-sm text-primary" role="status">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          {t("transcribing")}
+        </div>
+      )}
+
+      {reviewing && !transcribing && textInput.trim() && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground" role="status">
+          <PencilLine className="w-3.5 h-3.5" />
+          {t("reviewTranscript")}
+        </div>
+      )}
+
+      {/* Recording that failed to send / transcribe */}
+      {retryBlob && !isRecording && !transcribing && (
         <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 flex items-center justify-between gap-3">
-          <span className="text-sm text-amber-600 dark:text-amber-400">{t("unsentRecording")}</span>
+          <span className="text-sm text-amber-600 dark:text-amber-400">
+            {transcribeError ? t(transcribeError) : t("unsentRecording")}
+          </span>
           <div className="flex items-center gap-2 shrink-0">
             <Button size="sm" variant="outline" onClick={handleResendAudio} disabled={isDisabled} className="gap-1.5">
               <RotateCcw className="w-4 h-4" />
-              {t("resendRecording")}
+              {onTranscribe ? t("retryTranscribe") : t("resendRecording")}
             </Button>
             <Button size="icon" variant="ghost" onClick={handleDiscardAudio} title={t("discardRecording")} aria-label={t("discardRecording")}>
               <Trash2 className="w-4 h-4" />
@@ -154,8 +210,10 @@ export function AudioRecorder({
       {/* Text input + controls */}
       {!isRecording && (
         <div className="flex gap-2">
-          <Input
+          <textarea
+            ref={inputRef}
             value={textInput}
+            rows={reviewing ? 3 : 1}
             onChange={(e) => setTextInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -165,13 +223,15 @@ export function AudioRecorder({
             }}
             placeholder={isDisabled ? t("waitForAI") : t("typeAnswer")}
             disabled={isDisabled}
-            className="flex-1"
+            aria-label={t("typeAnswer")}
+            className="flex-1 min-h-10 max-h-40 resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
 
           <Button
             size="icon"
             variant="outline"
             onClick={handleToggleRecording}
+            aria-label={t("recordAudio")}
             disabled={isDisabled}
             className={cn(
               "shrink-0",

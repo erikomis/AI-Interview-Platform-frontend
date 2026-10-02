@@ -93,7 +93,13 @@
     "micError":         "Could not access the microphone.",
     "unsentRecording":  "Your recording was not sent.",
     "resendRecording":  "Resend",
-    "discardRecording": "Discard recording"
+    "discardRecording": "Discard recording",
+    "stopAndTranscribe": "Stop and transcribe",
+    "transcribing": "Transcribing your audio...",
+    "reviewTranscript": "Check the transcribed text, fix it if needed and send.",
+    "transcribeEmpty": "Couldn't understand the audio. Speak closer to the microphone and try again.",
+    "transcribeFailed": "Couldn't transcribe the audio.",
+    "retryTranscribe": "Try again"
   },
   "video": {
     "cameraOff":          "Camera disabled",

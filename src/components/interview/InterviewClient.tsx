@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { InterviewerPersona } from "@/types/interview";
+import { useTranscription } from "@/hooks/useTranscription";
 
 const AIAvatarScene = dynamic(
   () => import("@/components/avatar/AIAvatarScene").then((m) => ({ default: m.AIAvatarScene })),
@@ -46,6 +47,7 @@ export function InterviewClient() {
 
   // The persona stored with the interview wins over the form's (e.g. after a resync)
   const interviewer: InterviewerPersona = sessionInterviewer ?? selectedInterviewer;
+  const transcribeAudio = useTranscription(interviewId);
   const interviewerName = tc(interviewer === "female" ? "interviewerFemaleName" : "interviewerMaleName");
 
 
@@ -290,6 +292,7 @@ export function InterviewClient() {
                   aiStatus={aiStatus}
                   onSendText={(text) => sendAnswer(text, visionMetrics ?? undefined)}
                   onSendAudio={(blob) => sendAudioAnswer(blob, visionMetrics ?? undefined, candidateLanguage)}
+                  onTranscribe={transcribeAudio}
                   disabled={isComplete || !started || !!feedbackFailed}
                   failedText={failedAnswer?.kind === "text" ? failedAnswer.text : null}
                   failedAudio={failedAnswer?.kind === "audio" ? failedAnswer.blob : null}

@@ -93,7 +93,13 @@
     "micError":         "Não foi possível acessar o microfone.",
     "unsentRecording":  "Sua gravação não foi enviada.",
     "resendRecording":  "Reenviar",
-    "discardRecording": "Descartar gravação"
+    "discardRecording": "Descartar gravação",
+    "stopAndTranscribe": "Parar e transcrever",
+    "transcribing": "Transcrevendo seu áudio...",
+    "reviewTranscript": "Confira o texto transcrito, corrija se precisar e envie.",
+    "transcribeEmpty": "Não entendi o áudio. Fale mais perto do microfone e tente de novo.",
+    "transcribeFailed": "Não foi possível transcrever o áudio.",
+    "retryTranscribe": "Tentar de novo"
   },
   "video": {
     "cameraOff":          "Câmera desativada",
